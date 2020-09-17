@@ -9,6 +9,8 @@ import com.asyncapi.api.annotations.channel.operation.OperationTrait;
 import com.asyncapi.api.annotations.parameter.Parameter;
 import com.asyncapi.api.annotations.parameter.Parameters;
 import com.asyncapi.api.annotations.schema.Schema;
+import com.asyncapi.api.annotations.schema.SchemaProperty;
+import com.asyncapi.api.annotations.schema.SchemaType;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.reactive.messaging.mqtt.MqttMessage;
 import org.eclipse.microprofile.reactive.messaging.Outgoing;
@@ -31,7 +33,10 @@ public class TurnService {
           value = {
               @Parameter(
                   name = "streetlightId",
-                  ref = @Reference(ref = "#/components/parameters/streetlightId")
+                  description = "The ID of the streetlight.",
+                  schema = @Schema(
+                      type = SchemaType.STRING
+                  )
               )
           }
       ),
@@ -40,17 +45,26 @@ public class TurnService {
           traits = {
               @OperationTrait(ref = @Reference(ref = "#/components/operationTraits/kafka"))
           },
-          message = @Message(ref = @Reference(ref = "#/components/messages/turnOnOff"))
+          message = @Message(
+              name = "turnOnOff",
+              title = "TurnOnOff on/off",
+              summary = "Command a particular streetlight to turn the lights on or off.",
+              traits = {
+                  @MessageTrait(
+                      name = "commonHeaders",
+                      headers = @Schema(
+                          type = SchemaType.OBJECT,
+                          properties = @SchemaProperty(
+                              type = SchemaType.INTEGER,
+                              minimum = "0",
+                              maximum = "100"
+                          )
+                      )
+                  )
+              },
+              payload = @Schema(ref = @Reference(ref = "#/components/schemas/turnOnOffPayload"))
+          )
       )
-  )
-  @Message(
-      name = "turnOnOff",
-      title = "TurnOnOff on/off",
-      summary = "Command a particular streetlight to turn the lights on or off.",
-      traits = {
-          @MessageTrait(ref = @Reference(ref = "#/components/messageTraits/commonHeaders"))
-      },
-      payload = @Schema(ref = @Reference(ref = "#/components/schemas/turnOnOffPayload"))
   )
   @Outgoing("turnOn")
   public Multi<MqttMessage<TurnOnOff>> turnOn() {
