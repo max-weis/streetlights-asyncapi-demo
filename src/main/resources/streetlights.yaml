@@ -96,7 +96,7 @@ components:
         $ref: "#/components/schemas/lightMeasuredPayload"
     turnOnOff:
       name: turnOnOff
-      title: Turn on/off
+      title: TurnOnOff on/off
       summary: Command a particular streetlight to turn the lights on or off.
       traits:
         - $ref: '#/components/messageTraits/commonHeaders'

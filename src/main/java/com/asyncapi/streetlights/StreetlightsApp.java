@@ -20,7 +20,7 @@ import javax.ws.rs.core.Application;
         title = "Streetlights API",
         version = "1.0.0",
         description = "The Smartylighting Streetlights API allows you to remotely manage the city lights.\n" + "\n"
-            + "    ### Check out its awesome features:\n" + "\n" + "    * Turn a specific streetlight on/off \uD83C\uDF03\n"
+            + "    ### Check out its awesome features:\n" + "\n" + "    * TurnOnOff a specific streetlight on/off \uD83C\uDF03\n"
             + "    * Dim a specific streetlight \uD83D\uDE0E\n"
             + "    * Receive real-time information about environmental lighting conditions \uD83D\uDCC8",
         license = @License(

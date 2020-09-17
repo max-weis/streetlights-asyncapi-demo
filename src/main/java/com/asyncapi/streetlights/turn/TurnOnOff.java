@@ -1,4 +1,4 @@
-package com.asyncapi.streetlights.measure;
+package com.asyncapi.streetlights.turn;
 
 import com.asyncapi.api.annotations.Reference;
 import com.asyncapi.api.annotations.schema.Schema;
@@ -8,40 +8,40 @@ import com.asyncapi.api.annotations.schema.SchemaType;
 import java.time.LocalDateTime;
 
 @Schema(
-    name = "lightMeasuredPayload",
+    name = "turnOnOffPayload",
     type = SchemaType.OBJECT,
     properties = {
         @SchemaProperty(
-            name = "lumens",
-            type = SchemaType.INTEGER,
-            description = "Light intensity measured in lumens.",
-            minimum = "0"
+            name = "command",
+            type = SchemaType.STRING,
+            description = "Whether to turn on or off the light.",
+            enumeration = {"on","off"}
         ),
         @SchemaProperty(
             ref = @Reference(ref = "#/components/schemas/sentAt")
         )
     }
 )
-public class LightMeasured {
+public class TurnOnOff {
 
-  private int lumens;
+  private Command command;
 
   private LocalDateTime sentAt;
 
-  public LightMeasured() {
+  public TurnOnOff() {
   }
 
-  public LightMeasured(final int lumens, final LocalDateTime sentAt) {
-    this.lumens = lumens;
+  public TurnOnOff(final Command command, final LocalDateTime sentAt) {
+    this.command = command;
     this.sentAt = sentAt;
   }
 
-  public int getLumens() {
-    return lumens;
+  public Command getCommand() {
+    return command;
   }
 
-  public void setLumens(final int lumens) {
-    this.lumens = lumens;
+  public void setCommand(final Command command) {
+    this.command = command;
   }
 
   public LocalDateTime getSentAt() {
@@ -54,6 +54,6 @@ public class LightMeasured {
 
   @Override
   public String toString() {
-    return "LightMeasured{" + "lumens=" + lumens + ", sentAt=" + sentAt + '}';
+    return "TurnOnOff{" + "command=" + command + ", sentAt=" + sentAt.toString() + '}';
   }
 }

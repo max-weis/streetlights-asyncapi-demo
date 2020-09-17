@@ -45,7 +45,7 @@ public class TurnService {
   )
   @Message(
       name = "turnOnOff",
-      title = "Turn on/off",
+      title = "TurnOnOff on/off",
       summary = "Command a particular streetlight to turn the lights on or off.",
       traits = {
           @MessageTrait(ref = @Reference(ref = "#/components/messageTraits/commonHeaders"))
@@ -53,7 +53,7 @@ public class TurnService {
       payload = @Schema(ref = @Reference(ref = "#/components/schemas/turnOnOffPayload"))
   )
   @Outgoing("turnOn")
-  public Multi<MqttMessage<Turn>> turnOn() {
+  public Multi<MqttMessage<TurnOnOff>> turnOn() {
     return Multi
         .createFrom()
         .ticks()
@@ -80,7 +80,7 @@ public class TurnService {
       )
   )
   @Outgoing("turnOff")
-  public Multi<MqttMessage<Turn>> turnOff() {
+  public Multi<MqttMessage<TurnOnOff>> turnOff() {
     return Multi
         .createFrom()
         .ticks()
@@ -88,14 +88,14 @@ public class TurnService {
         .map(x -> generateMessage(Command.OFF));
   }
 
-  private static MqttMessage<Turn> generateMessage(final Command command) {
-    Turn turn = new Turn(command, LocalDateTime.now());
+  private static MqttMessage<TurnOnOff> generateMessage(final Command command) {
+    TurnOnOff turnOnOff = new TurnOnOff(command, LocalDateTime.now());
 
-    String topic = String.format("smartylighting/streetlights/1/0/action/%d/turn/%s", new Random().nextInt(1000), command.toString());
+    String topic = String.format("smartylighting/streetlights/1/0/action/%d/turnOnOff/%s", new Random().nextInt(1000), command.toString());
 
-    LOG.info("Send message: {}, to topic: {}", turn.toString(), topic);
+    LOG.info("Send message: {}, to topic: {}", turnOnOff.toString(), topic);
 
-    return MqttMessage.of(topic, turn);
+    return MqttMessage.of(topic, turnOnOff);
   }
 
 }
