@@ -3,10 +3,12 @@ package com.asyncapi.streetlights.measure;
 import com.asyncapi.api.annotations.Reference;
 import com.asyncapi.api.annotations.channel.ChannelItem;
 import com.asyncapi.api.annotations.channel.message.Message;
+import com.asyncapi.api.annotations.channel.message.MessageTrait;
 import com.asyncapi.api.annotations.channel.operation.Operation;
 import com.asyncapi.api.annotations.channel.operation.OperationTrait;
 import com.asyncapi.api.annotations.parameter.Parameter;
 import com.asyncapi.api.annotations.parameter.Parameters;
+import com.asyncapi.api.annotations.schema.Schema;
 import io.smallrye.reactive.messaging.mqtt.MqttMessage;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.slf4j.Logger;
@@ -39,6 +41,16 @@ public class MeasuredService {
           },
           message = @Message(ref = @Reference(ref = "#/components/messages/lightMeasured"))
       )
+  )
+  @Message(
+      name = "lightMeasured",
+      title = "Light measured",
+      summary = "Inform about environmental lighting conditions for a particular streetlight.",
+      contentType = "application/json",
+      traits = {
+          @MessageTrait(ref = @Reference(ref = "#/components/messageTraits/commonHeaders"))
+      },
+      payload = @Schema(ref = @Reference(ref = "#/components/schemas/lightMeasuredPayload"))
   )
   @Incoming("measure")
   public CompletionStage<Void> consume(final org.eclipse.microprofile.reactive.messaging.Message<byte[]> message) {

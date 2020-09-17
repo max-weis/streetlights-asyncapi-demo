@@ -3,10 +3,12 @@ package com.asyncapi.streetlights.dim;
 import com.asyncapi.api.annotations.Reference;
 import com.asyncapi.api.annotations.channel.ChannelItem;
 import com.asyncapi.api.annotations.channel.message.Message;
+import com.asyncapi.api.annotations.channel.message.MessageTrait;
 import com.asyncapi.api.annotations.channel.operation.Operation;
 import com.asyncapi.api.annotations.channel.operation.OperationTrait;
 import com.asyncapi.api.annotations.parameter.Parameter;
 import com.asyncapi.api.annotations.parameter.Parameters;
+import com.asyncapi.api.annotations.schema.Schema;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.reactive.messaging.mqtt.MqttMessage;
 import org.eclipse.microprofile.reactive.messaging.Outgoing;
@@ -40,6 +42,15 @@ public class DimService {
           },
           message = @Message(ref = @Reference(ref = "#/components/messages/dimLight"))
       )
+  )
+  @Message(
+      name = "dimLight",
+      title = "Dim light",
+      summary = "Command a particular streetlight to dim the lights.",
+      traits = {
+          @MessageTrait(ref = @Reference(ref = "#/components/messageTraits/commonHeaders"))
+      },
+      payload = @Schema(ref = @Reference(ref = "#/components/schemas/dimLightPayload"))
   )
   @Outgoing("dim")
   public Multi<MqttMessage<Dim>> dim() {

@@ -3,10 +3,12 @@ package com.asyncapi.streetlights.turn;
 import com.asyncapi.api.annotations.Reference;
 import com.asyncapi.api.annotations.channel.ChannelItem;
 import com.asyncapi.api.annotations.channel.message.Message;
+import com.asyncapi.api.annotations.channel.message.MessageTrait;
 import com.asyncapi.api.annotations.channel.operation.Operation;
 import com.asyncapi.api.annotations.channel.operation.OperationTrait;
 import com.asyncapi.api.annotations.parameter.Parameter;
 import com.asyncapi.api.annotations.parameter.Parameters;
+import com.asyncapi.api.annotations.schema.Schema;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.reactive.messaging.mqtt.MqttMessage;
 import org.eclipse.microprofile.reactive.messaging.Outgoing;
@@ -40,6 +42,15 @@ public class TurnService {
           },
           message = @Message(ref = @Reference(ref = "#/components/messages/turnOnOff"))
       )
+  )
+  @Message(
+      name = "turnOnOff",
+      title = "Turn on/off",
+      summary = "Command a particular streetlight to turn the lights on or off.",
+      traits = {
+          @MessageTrait(ref = @Reference(ref = "#/components/messageTraits/commonHeaders"))
+      },
+      payload = @Schema(ref = @Reference(ref = "#/components/schemas/turnOnOffPayload"))
   )
   @Outgoing("turnOn")
   public Multi<MqttMessage<Turn>> turnOn() {
