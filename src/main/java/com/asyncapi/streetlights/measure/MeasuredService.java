@@ -1,14 +1,13 @@
 package com.asyncapi.streetlights.measure;
 
-import com.asyncapi.api.annotations.Reference;
-import com.asyncapi.api.annotations.channel.ChannelItem;
-import com.asyncapi.api.annotations.channel.message.Message;
-import com.asyncapi.api.annotations.channel.message.MessageTrait;
-import com.asyncapi.api.annotations.channel.operation.Operation;
-import com.asyncapi.api.annotations.channel.operation.OperationTrait;
-import com.asyncapi.api.annotations.parameter.Parameter;
-import com.asyncapi.api.annotations.parameter.Parameters;
-import com.asyncapi.api.annotations.schema.Schema;
+import io.smallrye.asyncapi.spec.annotations.channel.ChannelItem;
+import io.smallrye.asyncapi.spec.annotations.message.Message;
+import io.smallrye.asyncapi.spec.annotations.message.MessageTrait;
+import io.smallrye.asyncapi.spec.annotations.operation.Operation;
+import io.smallrye.asyncapi.spec.annotations.operation.OperationTrait;
+import io.smallrye.asyncapi.spec.annotations.parameter.Parameter;
+import io.smallrye.asyncapi.spec.annotations.parameter.Parameters;
+import io.smallrye.asyncapi.spec.annotations.schema.Schema;
 import io.smallrye.reactive.messaging.mqtt.MqttMessage;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.slf4j.Logger;
@@ -29,7 +28,7 @@ public class MeasuredService {
           value = {
               @Parameter(
                   name = "streetlightId",
-                  ref = @Reference(ref = "#/components/parameters/streetlightId")
+                  ref = "#/components/parameters/streetlightId"
               )
           }
       ),
@@ -37,9 +36,9 @@ public class MeasuredService {
           summary = "Receive information about environmental lighting conditions of a particular streetlight.",
           operationId = "receiveLightMeasurement",
           traits = {
-            @OperationTrait(ref = @Reference(ref = "#/components/operationTraits/kafka"))
+            @OperationTrait(ref = "#/components/operationTraits/kafka")
           },
-          message = @Message(ref = @Reference(ref = "#/components/messages/lightMeasured"))
+          message = @Message(ref = "#/components/messages/lightMeasured")
       )
   )
   @Message(
@@ -48,9 +47,9 @@ public class MeasuredService {
       summary = "Inform about environmental lighting conditions for a particular streetlight.",
       contentType = "application/json",
       traits = {
-          @MessageTrait(ref = @Reference(ref = "#/components/messageTraits/commonHeaders"))
+          @MessageTrait(ref = "#/components/messageTraits/commonHeaders")
       },
-      payload = @Schema(ref = @Reference(ref = "#/components/schemas/lightMeasuredPayload"))
+      payload = @Schema(ref = "#/components/schemas/lightMeasuredPayload")
   )
   @Incoming("measure")
   public CompletionStage<Void> consume(final org.eclipse.microprofile.reactive.messaging.Message<byte[]> message) {

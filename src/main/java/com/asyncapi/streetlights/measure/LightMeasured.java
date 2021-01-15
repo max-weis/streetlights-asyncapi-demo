@@ -1,31 +1,16 @@
 package com.asyncapi.streetlights.measure;
-
-import com.asyncapi.api.annotations.Reference;
-import com.asyncapi.api.annotations.schema.Schema;
-import com.asyncapi.api.annotations.schema.SchemaProperty;
-import com.asyncapi.api.annotations.schema.SchemaType;
-
 import java.time.LocalDateTime;
 
-@Schema(
-    name = "lightMeasuredPayload",
-    type = SchemaType.OBJECT,
-    properties = {
-        @SchemaProperty(
-            name = "lumens",
-            type = SchemaType.INTEGER,
-            description = "Light intensity measured in lumens.",
-            minimum = "0"
-        ),
-        @SchemaProperty(
-            ref = @Reference(ref = "#/components/schemas/sentAt")
-        )
-    }
-)
+import io.smallrye.asyncapi.spec.annotations.schema.Schema;
+import io.smallrye.asyncapi.spec.annotations.schema.SchemaType;
+
+@Schema(name = "lightMeasuredPayload", type = SchemaType.OBJECT)
 public class LightMeasured {
 
+  @Schema(description = "Light intensity measured in lumens.", minimum = "0", required = true)
   private int lumens;
 
+  @Schema(ref = "#/components/schemas/sentAt")
   private LocalDateTime sentAt;
 
   public LightMeasured() {
@@ -50,10 +35,5 @@ public class LightMeasured {
 
   public void setSentAt(final LocalDateTime sentAt) {
     this.sentAt = sentAt;
-  }
-
-  @Override
-  public String toString() {
-    return "LightMeasured{" + "lumens=" + lumens + ", sentAt=" + sentAt + '}';
   }
 }

@@ -1,21 +1,23 @@
 package com.asyncapi.streetlights.turn;
 
-import com.asyncapi.api.annotations.Reference;
-import com.asyncapi.api.annotations.channel.ChannelItem;
-import com.asyncapi.api.annotations.channel.message.Message;
-import com.asyncapi.api.annotations.channel.message.MessageTrait;
-import com.asyncapi.api.annotations.channel.operation.Operation;
-import com.asyncapi.api.annotations.channel.operation.OperationTrait;
-import com.asyncapi.api.annotations.parameter.Parameter;
-import com.asyncapi.api.annotations.parameter.Parameters;
-import com.asyncapi.api.annotations.schema.Schema;
-import com.asyncapi.api.annotations.schema.SchemaProperty;
-import com.asyncapi.api.annotations.schema.SchemaType;
+import io.smallrye.asyncapi.spec.annotations.binding.ChannelBindings;
+import io.smallrye.asyncapi.spec.annotations.binding.amqp.AMQPChannelBinding;
+import io.smallrye.asyncapi.spec.annotations.binding.amqp.Exchange;
+import io.smallrye.asyncapi.spec.annotations.binding.amqp.Queue;
+import io.smallrye.asyncapi.spec.annotations.channel.ChannelItem;
+import io.smallrye.asyncapi.spec.annotations.message.CorrelationID;
+import io.smallrye.asyncapi.spec.annotations.message.Message;
+import io.smallrye.asyncapi.spec.annotations.message.MessageTrait;
+import io.smallrye.asyncapi.spec.annotations.operation.Operation;
+import io.smallrye.asyncapi.spec.annotations.operation.OperationTrait;
+import io.smallrye.asyncapi.spec.annotations.parameter.Parameter;
+import io.smallrye.asyncapi.spec.annotations.parameter.Parameters;
+import io.smallrye.asyncapi.spec.annotations.schema.Schema;
+import io.smallrye.asyncapi.spec.annotations.schema.SchemaProperty;
+import io.smallrye.asyncapi.spec.annotations.schema.SchemaType;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.reactive.messaging.mqtt.MqttMessage;
 import org.eclipse.microprofile.reactive.messaging.Outgoing;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import java.time.Duration;
@@ -25,80 +27,49 @@ import java.util.Random;
 @ApplicationScoped
 public class TurnService {
 
-  private static final Logger LOG = LoggerFactory.getLogger(TurnService.class);
-
-  @ChannelItem(
-      channel = "smartylighting/streetlights/1/0/action/{streetlightId}/turn/on",
-      parameters = @Parameters(
-          value = {
-              @Parameter(
-                  name = "streetlightId",
-                  description = "The ID of the streetlight.",
-                  schema = @Schema(
-                      type = SchemaType.STRING
-                  )
-              )
-          }
-      ),
-      publish = @Operation(
-          operationId = "receiveLightMeasurement",
-          traits = {
-              @OperationTrait(ref = @Reference(ref = "#/components/operationTraits/kafka"))
-          },
-          message = @Message(
-              name = "turnOnOff",
+  @ChannelItem(channel = "smartylighting/streetlights/1/0/action/{streetlightId}/turn/on",
+      parameters = @Parameters(value = { @Parameter(ref = "#/components/parameters/streetlightId") }),
+      bindings = @ChannelBindings(amqpBinding = @AMQPChannelBinding(exchange = @Exchange(),
+          queue = @Queue())),
+      publish = @Operation(operationId = "turnOn",
+          traits = { @OperationTrait(ref = "#/components/operationTraits/kafka") },
+          message = @Message(name = "turnOnOff",
               title = "TurnOnOff on/off",
               summary = "Command a particular streetlight to turn the lights on or off.",
-              traits = {
-                  @MessageTrait(
-                      name = "commonHeaders",
-                      headers = @Schema(
-                          type = SchemaType.OBJECT,
-                          properties = @SchemaProperty(
-                              type = SchemaType.INTEGER,
-                              minimum = "0",
-                              maximum = "100"
-                          )
-                      )
-                  )
-              },
-              payload = @Schema(ref = @Reference(ref = "#/components/schemas/turnOnOffPayload"))
-          )
-      )
-  )
+              correlationID = @CorrelationID(description = "Default Correlation ID",
+                  location = "$message.header#/correlationId"),
+              traits = { @MessageTrait(name = "commonHeaders",
+                  description = "Common Headers",
+                  contentType = "application/json",
+                  headers = @Schema(type = SchemaType.OBJECT,
+                      properties = @SchemaProperty(type = SchemaType.INTEGER,
+                          name = "commonHeaders",
+                          minimum = "0",
+                          maximum = "100")),
+                  example = { "{'minimum': 0, 'maximum': 100}", "{'minimum': 10, 'maximum': 50}" }) },
+              payload = @Schema(ref = "#/components/schemas/turnOnOffPayload"))))
+  @Parameter(name = "streetlightId",
+      description = "The ID of the streetlight.",
+      schema = @Schema(type = SchemaType.STRING))
   @Outgoing("turnOn")
   public Multi<MqttMessage<TurnOnOff>> turnOn() {
-    return Multi
-        .createFrom()
+    return Multi.createFrom()
         .ticks()
-        .every(Duration.ofSeconds(5))
+        .every(Duration.ofMinutes(1))
         .map(x -> generateMessage(Command.ON));
   }
 
-  @ChannelItem(
-      channel = "smartylighting/streetlights/1/0/action/{streetlightId}/turn/off",
-      parameters = @Parameters(
-          value = {
-              @Parameter(
-                  name = "streetlightId",
-                  ref = @Reference(ref = "#/components/parameters/streetlightId")
-              )
-          }
-      ),
-      publish = @Operation(
-          operationId = "receiveLightMeasurement",
-          traits = {
-              @OperationTrait(ref = @Reference(ref = "#/components/operationTraits/kafka"))
-          },
-          message = @Message(ref = @Reference(ref = "#/components/messages/turnOnOff"))
-      )
-  )
+  @ChannelItem(channel = "smartylighting/streetlights/1/0/action/{streetlightId}/turn/off",
+      parameters = @Parameters(value = { @Parameter(name = "streetlightId",
+          ref = "#/components/parameters/streetlightId") }),
+      publish = @Operation(operationId = "turnOff",
+          traits = { @OperationTrait(ref = "#/components/operationTraits/kafka") },
+          message = @Message(ref = "#/components/messages/turnOnOff")))
   @Outgoing("turnOff")
   public Multi<MqttMessage<TurnOnOff>> turnOff() {
-    return Multi
-        .createFrom()
+    return Multi.createFrom()
         .ticks()
-        .every(Duration.ofSeconds(5))
+        .every(Duration.ofMinutes(1))
         .map(x -> generateMessage(Command.OFF));
   }
 
@@ -107,7 +78,7 @@ public class TurnService {
 
     String topic = String.format("smartylighting/streetlights/1/0/action/%d/turnOnOff/%s", new Random().nextInt(1000), command.toString());
 
-    LOG.info("Send message: {}, to topic: {}", turnOnOff.toString(), topic);
+    System.out.println(String.format("Send message: %s, to topic: %s", turnOnOff.toString(), topic));
 
     return MqttMessage.of(topic, turnOnOff);
   }

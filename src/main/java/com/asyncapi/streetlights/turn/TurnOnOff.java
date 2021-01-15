@@ -1,31 +1,16 @@
 package com.asyncapi.streetlights.turn;
 
-import com.asyncapi.api.annotations.Reference;
-import com.asyncapi.api.annotations.schema.Schema;
-import com.asyncapi.api.annotations.schema.SchemaProperty;
-import com.asyncapi.api.annotations.schema.SchemaType;
+import io.smallrye.asyncapi.spec.annotations.schema.Schema;
 
 import java.time.LocalDateTime;
 
-@Schema(
-    name = "turnOnOffPayload",
-    type = SchemaType.OBJECT,
-    properties = {
-        @SchemaProperty(
-            name = "command",
-            type = SchemaType.STRING,
-            description = "Whether to turn on or off the light.",
-            enumeration = {"on","off"}
-        ),
-        @SchemaProperty(
-            ref = @Reference(ref = "#/components/schemas/sentAt")
-        )
-    }
-)
+@Schema(name = "turnOnOffPayload")
 public class TurnOnOff {
 
-  private Command command;
+  @Schema(required = true)
+  public Command command;
 
+  @Schema(name = "sentAt", required = true)
   private LocalDateTime sentAt;
 
   public TurnOnOff() {
@@ -50,10 +35,5 @@ public class TurnOnOff {
 
   public void setSentAt(final LocalDateTime sentAt) {
     this.sentAt = sentAt;
-  }
-
-  @Override
-  public String toString() {
-    return "TurnOnOff{" + "command=" + command + ", sentAt=" + sentAt.toString() + '}';
   }
 }
