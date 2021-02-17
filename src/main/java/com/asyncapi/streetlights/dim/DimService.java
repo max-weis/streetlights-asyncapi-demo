@@ -29,16 +29,12 @@ public class DimService {
       parameters = @Parameters(
           value = {
               @Parameter(
-                  name = "streetlightId",
-                  ref = "#/components/parameters/streetlightId"
+                  name = "streetlightId"
               )
           }
       ),
       publish = @Operation(
           operationId = "dimLight",
-          traits = {
-              @OperationTrait(ref = "#/components/operationTraits/kafka")
-          },
           message = @Message(ref = "#/components/messages/dimLight")
       )
   )
@@ -46,10 +42,7 @@ public class DimService {
       name = "dimLight",
       title = "Dim light",
       summary = "Command a particular streetlight to dim the lights.",
-      traits = {
-          @MessageTrait(ref = "#/components/messageTraits/commonHeaders")
-      },
-      payload = @Schema(ref = "#/components/schemas/dimLightPayload")
+      payload = @Schema(ref = "#/components/schemas/Dim")
   )
   @Outgoing("dim")
   public Multi<MqttMessage<Dim>> dim() {

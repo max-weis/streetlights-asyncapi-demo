@@ -5,6 +5,7 @@ import io.smallrye.asyncapi.spec.annotations.schema.SchemaType;
 
 import java.time.LocalDateTime;
 
+@Schema
 public class Dim {
 
   @Schema(description = "Percentage to which the light should be dimmed to.", minimum = "0", maximum = "100")

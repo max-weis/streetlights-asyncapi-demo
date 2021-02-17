@@ -1,15 +1,10 @@
 package com.asyncapi.streetlights.turn;
 
-import io.smallrye.asyncapi.spec.annotations.binding.ChannelBindings;
-import io.smallrye.asyncapi.spec.annotations.binding.amqp.AMQPChannelBinding;
-import io.smallrye.asyncapi.spec.annotations.binding.amqp.Exchange;
-import io.smallrye.asyncapi.spec.annotations.binding.amqp.Queue;
 import io.smallrye.asyncapi.spec.annotations.channel.ChannelItem;
 import io.smallrye.asyncapi.spec.annotations.message.CorrelationID;
 import io.smallrye.asyncapi.spec.annotations.message.Message;
 import io.smallrye.asyncapi.spec.annotations.message.MessageTrait;
 import io.smallrye.asyncapi.spec.annotations.operation.Operation;
-import io.smallrye.asyncapi.spec.annotations.operation.OperationTrait;
 import io.smallrye.asyncapi.spec.annotations.parameter.Parameter;
 import io.smallrye.asyncapi.spec.annotations.parameter.Parameters;
 import io.smallrye.asyncapi.spec.annotations.schema.Schema;
@@ -28,29 +23,29 @@ import java.util.Random;
 public class TurnService {
 
   @ChannelItem(channel = "smartylighting/streetlights/1/0/action/{streetlightId}/turn/on",
-      parameters = @Parameters(value = { @Parameter(ref = "#/components/parameters/streetlightId") }),
-      bindings = @ChannelBindings(amqpBinding = @AMQPChannelBinding(exchange = @Exchange(),
-          queue = @Queue())),
+      parameters = @Parameters(value = { @Parameter(name = "streetlightId",
+          ref = "#/components/parameters/streetlightId") }),
       publish = @Operation(operationId = "turnOn",
-          traits = { @OperationTrait(ref = "#/components/operationTraits/kafka") },
-          message = @Message(name = "turnOnOff",
-              title = "TurnOnOff on/off",
-              summary = "Command a particular streetlight to turn the lights on or off.",
-              correlationID = @CorrelationID(description = "Default Correlation ID",
-                  location = "$message.header#/correlationId"),
-              traits = { @MessageTrait(name = "commonHeaders",
-                  description = "Common Headers",
-                  contentType = "application/json",
-                  headers = @Schema(type = SchemaType.OBJECT,
-                      properties = @SchemaProperty(type = SchemaType.INTEGER,
-                          name = "commonHeaders",
-                          minimum = "0",
-                          maximum = "100")),
-                  example = { "{'minimum': 0, 'maximum': 100}", "{'minimum': 10, 'maximum': 50}" }) },
-              payload = @Schema(ref = "#/components/schemas/turnOnOffPayload"))))
+          message = @Message(ref = "#/components/messages/turnOnOff")))
+
   @Parameter(name = "streetlightId",
       description = "The ID of the streetlight.",
       schema = @Schema(type = SchemaType.STRING))
+
+  @Message(name = "turnOnOff",
+      title = "TurnOnOff on/off",
+      summary = "Command a particular streetlight to turn the lights on or off.",
+      payload = @Schema(ref = "#/components/schemas/TurnOnOff"))
+
+  @MessageTrait(name = "commonHeaders",
+      description = "Common Headers",
+      contentType = "application/json",
+      headers = @Schema(type = SchemaType.OBJECT,
+          properties = @SchemaProperty(type = SchemaType.INTEGER,
+              name = "commonHeaders",
+              minimum = "0",
+              maximum = "100"))
+  )
   @Outgoing("turnOn")
   public Multi<MqttMessage<TurnOnOff>> turnOn() {
     return Multi.createFrom()
@@ -63,7 +58,6 @@ public class TurnService {
       parameters = @Parameters(value = { @Parameter(name = "streetlightId",
           ref = "#/components/parameters/streetlightId") }),
       publish = @Operation(operationId = "turnOff",
-          traits = { @OperationTrait(ref = "#/components/operationTraits/kafka") },
           message = @Message(ref = "#/components/messages/turnOnOff")))
   @Outgoing("turnOff")
   public Multi<MqttMessage<TurnOnOff>> turnOff() {

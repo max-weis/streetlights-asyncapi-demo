@@ -7,7 +7,7 @@ import io.smallrye.asyncapi.spec.annotations.schema.SchemaType;
 @Schema(name = "lightMeasuredPayload", type = SchemaType.OBJECT)
 public class LightMeasured {
 
-  @Schema(description = "Light intensity measured in lumens.", minimum = "0", required = true)
+  @Schema(description = "Light intensity measured in lumens.", minimum = "0")
   private int lumens;
 
   @Schema(ref = "#/components/schemas/sentAt")

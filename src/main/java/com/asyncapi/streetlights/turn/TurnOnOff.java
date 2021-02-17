@@ -4,13 +4,13 @@ import io.smallrye.asyncapi.spec.annotations.schema.Schema;
 
 import java.time.LocalDateTime;
 
-@Schema(name = "turnOnOffPayload")
+@Schema
 public class TurnOnOff {
 
-  @Schema(required = true)
+  @Schema
   public Command command;
 
-  @Schema(name = "sentAt", required = true)
+  @Schema(name = "sentAt")
   private LocalDateTime sentAt;
 
   public TurnOnOff() {

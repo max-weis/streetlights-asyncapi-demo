@@ -29,6 +29,7 @@ import io.smallrye.asyncapi.spec.annotations.tag.Tag;
     servers = { @Server(url = "api.streetlights.smartylighting.com:{port}",
         protocol = "mqtt",
         description = "Test broker",
+        name = "production",
         variables = { @ServerVariable(name = "port",
             description = "Secure connection (TLS) is available through port 8883.",
             defaultValue = "1883",
